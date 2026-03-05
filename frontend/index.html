@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Market Research – Role Based Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="card">
+        <header class="card__header">
+          <h1>Market Research Portal</h1>
+          <p class="subtitle">Sign in to continue</p>
+        </header>
+
+        <form id="login-form" class="form">
+          <div class="form__field">
+            <label for="username">Username</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              autocomplete="username"
+              required
+            />
+          </div>
+
+          <div class="form__field">
+            <label for="password">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+            />
+          </div>
+
+          <button type="submit" class="button button--primary">
+            Login
+          </button>
+        </form>
+
+        <section id="login-status" class="status status--hidden"></section>
+
+        <section id="role-panel" class="role role--hidden">
+          <h2 id="role-title"></h2>
+          <p id="role-description"></p>
+
+          <div id="role-actions" class="role__actions"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+  </html>
+

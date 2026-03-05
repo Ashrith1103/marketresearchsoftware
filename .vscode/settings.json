@@ -1,0 +1,11 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "c:\\Users\\Renita Kurian\\Downloads\\Other\\mysql-connector-j-8.0.33.jar",
+        "c:\\Users\\Renita Kurian\\Downloads\\Other\\itextpdf-5.4.1.jar",
+        "c:\\Users\\Renita Kurian\\Downloads\\Other\\javax.servlet.jar",
+        "c:\\Users\\Renita Kurian\\Downloads\\Other\\JAR files\\itextpdf-5.4.1.jar",
+        "c:\\Users\\Renita Kurian\\Downloads\\Other\\JAR files\\javax.servlet.jar",
+        "c:\\Users\\Renita Kurian\\Downloads\\Other\\JAR files\\mysql-connector-j-8.0.33.jar"
+    ]
+}
