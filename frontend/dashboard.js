@@ -31,7 +31,21 @@ function askRequired(promptText) {
   return trimmed;
 }
 
-function getActionParams(role, actionKey) {
+async function getSurveyQuestions(surveyID) {
+  const url = new URL(`${BACKEND_BASE_URL}/customer/surveys`);
+  url.searchParams.set("username", session.username);
+
+  const response = await fetch(url.toString(), { method: "GET" });
+  if (!response.ok) {
+    return null;
+  }
+
+  const payload = await response.json();
+  const surveys = Array.isArray(payload?.surveys) ? payload.surveys : [];
+  return surveys.find((s) => String(s.surveyID) === String(surveyID)) || null;
+}
+
+async function getActionParams(role, actionKey) {
   if (role === "MarketResearcher" && actionKey === "create-survey") {
     const pname = askRequired("Product name:");
     if (!pname) return null;
@@ -58,11 +72,27 @@ function getActionParams(role, actionKey) {
   if (role === "Customer" && actionKey === "fill-survey") {
     const surveyID = askRequired("Survey ID:");
     if (!surveyID) return null;
-    const a1 = askRequired("Answer 1:");
+
+    let question1 = "Question 1";
+    let question2 = "Question 2";
+    let question3 = "Question 3";
+    try {
+      const survey = await getSurveyQuestions(surveyID);
+      if (!survey) {
+        return { _invalid: "Survey ID not found. Please open 'View available surveys' and use a valid ID." };
+      }
+      question1 = survey.q1 || question1;
+      question2 = survey.q2 || question2;
+      question3 = survey.q3 || question3;
+    } catch (error) {
+      return { _invalid: "Could not load survey questions. Please try again." };
+    }
+
+    const a1 = askRequired(`${question1}`);
     if (!a1) return null;
-    const a2 = askRequired("Answer 2:");
+    const a2 = askRequired(`${question2}`);
     if (!a2) return null;
-    const a3 = askRequired("Answer 3:");
+    const a3 = askRequired(`${question3}`);
     if (!a3) return null;
     return { surveyID, a1, a2, a3 };
   }
@@ -155,6 +185,11 @@ function renderActionOutput(result) {
     return;
   }
 
+  if (Array.isArray(result?.surveyAnswers)) {
+    renderResultTable(result.surveyAnswers);
+    return;
+  }
+
   resultPanel.classList.add("role--hidden");
   resultOutput.innerHTML = "";
 }
@@ -166,11 +201,13 @@ function getActionRoute(role, actionKey) {
     if (actionKey === "delete-survey") return "/market-researcher/surveys/delete";
     if (actionKey === "view-reports") return "/market-researcher/reports";
     if (actionKey === "manage-catalogue") return "/market-researcher/catalogue";
+      if (actionKey === "view-survey-answers") return "/market-researcher/survey-answers";
   } else if (role === "CompanyExecutive") {
     if (actionKey === "view-company-catalogue") return "/company-exec/catalogue";
     if (actionKey === "view-report-summary") return "/company-exec/reports";
     if (actionKey === "generate-report") return "/company-exec/reports";
     if (actionKey === "view-reviews") return "/company-exec/reviews";
+    if (actionKey === "view-survey-answers") return "/company-exec/survey-answers";
   } else if (role === "Customer") {
     if (actionKey === "fill-survey") return "/customer/surveys/fill";
     if (actionKey === "fill-review") return "/customer/reviews/fill";
@@ -199,7 +236,7 @@ async function callBackendAction(role, actionKey) {
   const url = new URL(`${BACKEND_BASE_URL}${path}`);
   url.searchParams.set("username", session.username);
 
-  const extraParams = getActionParams(role, actionKey);
+  const extraParams = await getActionParams(role, actionKey);
   if (extraParams === null) {
     return { success: false, message: "Action cancelled." };
   }
@@ -230,6 +267,7 @@ function getRoleConfig(role, company, accessLevel) {
         { label: "Create survey", key: "create-survey" },
         { label: "Manage surveys", key: "manage-surveys" },
         { label: "Delete survey", key: "delete-survey" },
+        { label: "View survey answers", key: "view-survey-answers" },
         { label: "View and export reports", key: "view-reports" },
         { label: "Manage product catalogue", key: "manage-catalogue" },
       ],
@@ -247,6 +285,7 @@ function getRoleConfig(role, company, accessLevel) {
         { label: "View report summary", key: "view-report-summary" },
         { label: "Generate report", key: "generate-report" },
         { label: "View product reviews", key: "view-reviews" },
+        { label: "View survey answers", key: "view-survey-answers" },
       ],
     };
   }

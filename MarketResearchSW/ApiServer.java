@@ -44,9 +44,11 @@ public class ApiServer {
         server.createContext("/market-researcher/surveys/delete", new ActionHandler("market-researcher-delete-survey"));
         server.createContext("/market-researcher/reports", new ActionHandler("market-researcher-reports"));
         server.createContext("/market-researcher/catalogue", new ActionHandler("market-researcher-catalogue"));
+        server.createContext("/market-researcher/survey-answers", new ActionHandler("market-researcher-survey-answers"));
         server.createContext("/company-exec/catalogue", new ActionHandler("company-exec-catalogue"));
         server.createContext("/company-exec/reports", new ActionHandler("company-exec-reports"));
         server.createContext("/company-exec/reviews", new ActionHandler("company-exec-reviews"));
+        server.createContext("/company-exec/survey-answers", new ActionHandler("company-exec-survey-answers"));
         server.createContext("/customer/surveys/fill", new ActionHandler("customer-fill-survey"));
         server.createContext("/customer/reviews/fill", new ActionHandler("customer-fill-review"));
         server.createContext("/customer/reviews", new ActionHandler("customer-reviews"));
@@ -238,6 +240,16 @@ public class ApiServer {
                                 "{\"success\":true,\"message\":\"Company catalogue retrieved.\",\"catalogue\":" + catalogue + "}");
                         return;
 
+                    case "market-researcher-survey-answers":
+                        if (user.role != Role.MarketResearcher) {
+                            sendJson(exchange, 403, "{\"success\":false,\"message\":\"This endpoint is only for Market Researchers.\"}");
+                            return;
+                        }
+                        String mrSurveyAnswers = getCompanySurveyAnswersJson(user.company);
+                        sendJson(exchange, 200,
+                                "{\"success\":true,\"message\":\"Survey answers retrieved.\",\"surveyAnswers\":" + mrSurveyAnswers + "}");
+                        return;
+
                     case "company-exec-catalogue":
                         if (user.role != Role.CompanyExecutive) {
                             sendJson(exchange, 403, "{\"success\":false,\"message\":\"This endpoint is only for Company Executives.\"}");
@@ -282,6 +294,16 @@ public class ApiServer {
                                 "{\"success\":true,\"message\":\"Reviews retrieved.\",\"reviews\":" + reviews + "}");
                         return;
 
+                    case "company-exec-survey-answers":
+                        if (user.role != Role.CompanyExecutive) {
+                            sendJson(exchange, 403, "{\"success\":false,\"message\":\"This endpoint is only for Company Executives.\"}");
+                            return;
+                        }
+                        String surveyAnswers = getCompanySurveyAnswersJson(user.company);
+                        sendJson(exchange, 200,
+                                "{\"success\":true,\"message\":\"Survey answers retrieved.\",\"surveyAnswers\":" + surveyAnswers + "}");
+                        return;
+
                     case "customer-fill-survey":
                         if (user.role != Role.Customer) {
                             sendJson(exchange, 403, "{\"success\":false,\"message\":\"This endpoint is only for Customers.\"}");
@@ -295,7 +317,11 @@ public class ApiServer {
                             sendJson(exchange, 200, "{\"success\":false,\"message\":\"Fill survey requires surveyID, a1, a2, a3 params.\"}");
                             return;
                         }
-                        user.fillSurvey(surveyID, a1, a2, a3);
+                        boolean surveySubmitted = user.fillSurvey(surveyID, a1, a2, a3);
+                        if (!surveySubmitted) {
+                            sendJson(exchange, 200, "{\"success\":false,\"message\":\"Survey response was not saved. Please check Survey ID and try again.\"}");
+                            return;
+                        }
                         sendJson(exchange, 200, "{\"success\":true,\"message\":\"Survey submitted successfully.\"}");
                         return;
 
@@ -696,6 +722,74 @@ public class ApiServer {
                         .append("\"review\":\"").append(escapeJson(resultSet.getString("review"))).append("\",")
                         .append("\"username\":\"").append(escapeJson(resultSet.getString("username"))).append("\",")
                         .append("\"date\":\"").append(escapeJson(resultSet.getString("date"))).append("\"}");
+                first = false;
+            }
+            builder.append("]");
+
+            resultSet.close();
+            statement.close();
+            connection.close();
+            return builder.toString();
+        } catch (Exception e) {
+            return "[]";
+        }
+    }
+
+    private static String getCompanySurveyAnswersJson(String companyName) {
+        if (isBlank(companyName)) {
+            return "[]";
+        }
+
+        Connection connection = null;
+        try {
+            connection = getDatabaseConnection();
+            if (connection == null) {
+                return "[]";
+            }
+
+            Statement statement = connection.createStatement();
+            ResultSet companySet = statement.executeQuery(
+                    "select ID from company where name = \"" + escapeSql(companyName) + "\";");
+
+            String companyId = null;
+            if (companySet.next()) {
+                companyId = companySet.getString("ID");
+            }
+            companySet.close();
+
+            if (isBlank(companyId)) {
+                statement.close();
+                connection.close();
+                return "[]";
+            }
+
+            String query =
+                    "select sr.surveyID, sr.responseID, p.ID as productID, p.name as productName, " +
+                            "s.q1, s.q2, s.q3, sr.A1, sr.A2, sr.A3 " +
+                            "from surveyresponse sr " +
+                            "join survey s on s.ID = sr.surveyID " +
+                            "join products p on p.ID = s.productid " +
+                            "where p.companyID = \"" + escapeSql(companyId) + "\" " +
+                            "order by sr.surveyID, sr.responseID;";
+
+            ResultSet resultSet = statement.executeQuery(query);
+
+            StringBuilder builder = new StringBuilder("[");
+            boolean first = true;
+            while (resultSet.next()) {
+                if (!first) {
+                    builder.append(",");
+                }
+                builder.append("{\"surveyID\":\"").append(escapeJson(resultSet.getString("surveyID"))).append("\",")
+                        .append("\"responseID\":\"").append(escapeJson(resultSet.getString("responseID"))).append("\",")
+                        .append("\"productID\":\"").append(escapeJson(resultSet.getString("productID"))).append("\",")
+                        .append("\"productName\":\"").append(escapeJson(resultSet.getString("productName"))).append("\",")
+                        .append("\"q1\":\"").append(escapeJson(resultSet.getString("q1"))).append("\",")
+                        .append("\"q2\":\"").append(escapeJson(resultSet.getString("q2"))).append("\",")
+                        .append("\"q3\":\"").append(escapeJson(resultSet.getString("q3"))).append("\",")
+                        .append("\"a1\":\"").append(escapeJson(resultSet.getString("A1"))).append("\",")
+                        .append("\"a2\":\"").append(escapeJson(resultSet.getString("A2"))).append("\",")
+                        .append("\"a3\":\"").append(escapeJson(resultSet.getString("A3"))).append("\"}");
                 first = false;
             }
             builder.append("]");

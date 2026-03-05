@@ -70,9 +70,10 @@ class User
         return x;
     }
 
-    void fillSurvey(String surveyID, String a1, String a2, String a3)
+    boolean fillSurvey(String surveyID, String a1, String a2, String a3)
     {
         errorMsg();
+        return false;
     }
     ResultSet viewAvailableSurveys()
     {

@@ -16,7 +16,7 @@ class Customer extends User
     }
 
     @Override
-    void fillSurvey(String surveyID, String a1, String a2, String a3)
+     boolean fillSurvey(String surveyID, String a1, String a2, String a3)
     {
        SurveyFilled answers = new SurveyFilled(surveyID);
        answers.fillAnswer1(a1);
@@ -24,9 +24,12 @@ class Customer extends User
        answers.fillAnswer3(a3);
        //put answers back in db
        //System.out.println(answers.answer1);
-       answers.fillSurveyForm(this);
+         boolean submitted = answers.fillSurveyForm(this);
        //confirmation msg
-       System.out.println("Survey has been filled");
+         if (submitted) {
+              System.out.println("Survey has been filled");
+         }
+         return submitted;
     }
 
     @Override

@@ -157,13 +157,18 @@ class SurveyFilled
         this.answer3 = "";
     }
 
-    void fillSurveyForm(User u)
+    boolean fillSurveyForm(User u)
     {
         //update Survey results db with above parameters
+        if (u == null || u.username == null || u.username.isBlank() || this.surveyID == null || this.surveyID.isBlank()) {
+            System.out.println("Invalid survey submission request");
+            return false;
+        }
+
         String username = u.username;
 
         Random rand = new Random();
-        String newID = surveyID + username + rand.nextInt(1000);
+        String newID = "R" + Math.abs((surveyID + username + rand.nextInt(100000)).hashCode());
 
         Connection connection = null;
 
@@ -171,21 +176,39 @@ class SurveyFilled
         {
             // below two lines are used for connectivity.
             connection = DBConnect.getConnection();
- 
-            Statement statement;
-            statement = connection.createStatement();
 
-            String command = "insert into surveyresponse values(\"" + this.surveyID + "\",\"" + newID + "\",\"" + this.answer1 + "\",\"" + this.answer2 + "\",\"" + this.answer3+ "\");";
-            //System.out.println(command);
-            statement.executeUpdate(command);
+            String surveyCheckSql = "select 1 from survey where ID = ? limit 1";
+            PreparedStatement surveyCheck = connection.prepareStatement(surveyCheckSql);
+            surveyCheck.setString(1, this.surveyID);
+            ResultSet surveyExists = surveyCheck.executeQuery();
+            if (!surveyExists.next()) {
+                surveyExists.close();
+                surveyCheck.close();
+                connection.close();
+                System.out.println("Survey ID not found");
+                return false;
+            }
+            surveyExists.close();
+            surveyCheck.close();
 
-            statement.close();
+            String command = "insert into surveyresponse (surveyID, responseID, A1, A2, A3) values (?, ?, ?, ?, ?)";
+            PreparedStatement insertStatement = connection.prepareStatement(command);
+            insertStatement.setString(1, this.surveyID);
+            insertStatement.setString(2, newID);
+            insertStatement.setString(3, this.answer1);
+            insertStatement.setString(4, this.answer2);
+            insertStatement.setString(5, this.answer3);
+            int rows = insertStatement.executeUpdate();
+
+            insertStatement.close();
             connection.close();
+            return rows > 0;
 
         }
         catch(Exception e)
         {
-            System.out.println("There was an issue filling survey");
+            System.out.println("There was an issue filling survey: " + e.getMessage());
+            return false;
         }
 
     }
