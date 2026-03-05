@@ -84,10 +84,10 @@ CREATE TABLE `review` (
 --
 
 INSERT INTO `review` (`ID`, `PID`, `UserID`, `date`, `rating`, `review`) VALUES
-('MN890root378', 'MN890', 'Riya', '2023-04-28', 4, 'Nice front camera...better speed'),
-('POLKJFG98root267', 'POLKJFG98', 'Riya', '2023-04-28', 3, ''),
-('POLKJFG98root312', 'POLKJFG98', 'Riya', '2023-04-28', 3, 'Good mobile'),
-('POLKJFG98root640', 'POLKJFG98', 'Riya', '2023-04-28', 4, 'Nice smartphone for regular users');
+('MN890root378', 'MN890', 'demo', '2023-04-28', 4, 'Nice front camera...better speed'),
+('POLKJFG98root267', 'POLKJFG98', 'demo', '2023-04-28', 3, ''),
+('POLKJFG98root312', 'POLKJFG98', 'demo', '2023-04-28', 3, 'Good mobile'),
+('POLKJFG98root640', 'POLKJFG98', 'demo', '2023-04-28', 4, 'Nice smartphone for regular users');
 
 -- --------------------------------------------------------
 
@@ -132,8 +132,8 @@ CREATE TABLE `surveyresponse` (
 --
 
 INSERT INTO `surveyresponse` (`surveyID`, `responseID`, `A1`, `A2`, `A3`) VALUES
-('S21Samsung37', 'S21Samsung37Riya27', 'Yes', 'Not much', '5'),
-('S21Samsung37', 'S21Samsung37Riya29', 'Relatively better', 'No', '5');
+('S21Samsung37', 'S21Samsung37demo27', 'Yes', 'Not much', '5'),
+('S21Samsung37', 'S21Samsung37demo29', 'Relatively better', 'No', '5');
 
 -- --------------------------------------------------------
 
@@ -155,10 +155,8 @@ CREATE TABLE `userlogin` (
 
 INSERT INTO `userlogin` (`username`, `password`, `company`, `role`, `accesslevel`) VALUES
 ('demo', 'qwerty', '', 'Customer', 0),
-('Renita Kurian', 'Password', 'Samsung', 'Market Researcher', 1),
-('Richa', 'LastPass', 'Samsung', 'Company Executive', 1),
-('Rimi', '12345612', '', 'Customer', 0),
-('Riya', '1234', '', 'Customer', 1);
+('exec1', 'test123', 'Samsung', 'Company Executive', 1),
+('customer1', 'test123', '', 'Customer', 0);
 
 --
 -- Indexes for dumped tables

@@ -95,7 +95,6 @@ CREATE TABLE `review` (
 
 LOCK TABLES `review` WRITE;
 /*!40000 ALTER TABLE `review` DISABLE KEYS */;
-INSERT INTO `review` VALUES ('POLKJFG98root787','POLKJFG98','Riya','2023-04-25',4,'Pretty cool');
 /*!40000 ALTER TABLE `review` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -153,7 +152,6 @@ CREATE TABLE `surveyresponse` (
 
 LOCK TABLES `surveyresponse` WRITE;
 /*!40000 ALTER TABLE `surveyresponse` DISABLE KEYS */;
-INSERT INTO `surveyresponse` VALUES ('SLKFJG20498R','SLKFJG20498RRiya429','Good','Meh','IDC');
 /*!40000 ALTER TABLE `surveyresponse` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -180,7 +178,6 @@ CREATE TABLE `userlogin` (
 
 LOCK TABLES `userlogin` WRITE;
 /*!40000 ALTER TABLE `userlogin` DISABLE KEYS */;
-INSERT INTO `userlogin` VALUES ('Renita Kurian','Password','Samsung','Market Researcher',1),('Riya','1234','','Customer',1);
 /*!40000 ALTER TABLE `userlogin` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
