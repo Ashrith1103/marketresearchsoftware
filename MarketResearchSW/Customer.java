@@ -37,10 +37,7 @@ class Customer extends User
         try 
         {
             // below two lines are used for connectivity.
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/marketresearchsw",
-                "root", "Ash11032004");
+            connection = DBConnect.getConnection();
  
             Statement statement;
             statement = connection.createStatement();
@@ -111,10 +108,7 @@ class Customer extends User
         try 
         {
             // below two lines are used for connectivity.
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/marketresearchsw",
-                "root", "Ash11032004");
+            connection = DBConnect.getConnection();
  
             Statement statement;
             statement = connection.createStatement();

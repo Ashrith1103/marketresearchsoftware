@@ -17,10 +17,7 @@ class Catalogue
         Connection connection = null;
         try
         {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/marketresearchsw",
-                "root", "Ash11032004");
+            connection = DBConnect.getConnection();
 
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(
@@ -68,10 +65,7 @@ class Catalogue
         Connection connection = null;
         try
         {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/marketresearchsw",
-                "root", "Ash11032004");
+            connection = DBConnect.getConnection();
 
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("select * from products;");

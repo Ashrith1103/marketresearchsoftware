@@ -12,7 +12,6 @@ import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
@@ -330,7 +329,6 @@ public class ApiServer {
     private static User loadUserByUsername(String username) {
         Connection connection = null;
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
             connection = getDatabaseConnection();
 
             if (connection == null) {
@@ -367,16 +365,10 @@ public class ApiServer {
     }
 
     private static Connection getDatabaseConnection() {
-        String url = "jdbc:mysql://localhost:3306/marketresearchsw";
-        String username = "root";
         try {
-            return DriverManager.getConnection(url, username, "");
+            return DBConnect.getConnection();
         } catch (Exception e) {
-            try {
-                return DriverManager.getConnection(url, username, "Ash11032004");
-            } catch (Exception ignored) {
-                return null;
-            }
+            return null;
         }
     }
 
@@ -387,7 +379,6 @@ public class ApiServer {
 
         Connection connection = null;
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
             connection = getDatabaseConnection();
             if (connection == null) {
                 return "[]";
@@ -442,7 +433,6 @@ public class ApiServer {
 
         Connection connection = null;
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
             connection = getDatabaseConnection();
             if (connection == null) {
                 return "[]";
@@ -504,7 +494,6 @@ public class ApiServer {
 
         Connection connection = null;
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
             connection = getDatabaseConnection();
             if (connection == null) {
                 return "[]";
@@ -564,7 +553,6 @@ public class ApiServer {
 
         Connection connection = null;
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
             connection = getDatabaseConnection();
             if (connection == null) {
                 return false;
@@ -617,7 +605,6 @@ public class ApiServer {
 
         Connection connection = null;
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
             connection = getDatabaseConnection();
             if (connection == null) {
                 return "[]";
@@ -681,7 +668,6 @@ public class ApiServer {
     private static String getAllSurveysJson() {
         Connection connection = null;
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
             connection = getDatabaseConnection();
             if (connection == null) {
                 return "[]";
@@ -725,7 +711,6 @@ public class ApiServer {
     private static String getAllCatalogueJson() {
         Connection connection = null;
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
             connection = getDatabaseConnection();
             if (connection == null) {
                 return "[]";

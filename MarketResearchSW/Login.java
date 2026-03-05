@@ -23,8 +23,6 @@ class Login
 
         try 
         {
-            // below two lines are used for connectivity.
-            Class.forName("com.mysql.cj.jdbc.Driver");
             connection = connectToDatabase();
 
             if(connection == null)
@@ -93,23 +91,13 @@ class Login
 
     private Connection connectToDatabase()
     {
-        String url = "jdbc:mysql://localhost:3306/marketresearchsw";
-        String username = "root";
-
         try
         {
-            return DriverManager.getConnection(url, username, "");
+            return DBConnect.getConnection();
         }
         catch(Exception e)
         {
-            try
-            {
-                return DriverManager.getConnection(url, username, "Ash11032004");
-            }
-            catch(Exception ignored)
-            {
-                return null;
-            }
+            return null;
         }
     }
 

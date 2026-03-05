@@ -1,7 +1,6 @@
 package MarketResearchSW;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
@@ -25,17 +24,12 @@ class Review
 
     void addReview(User u) 
     {
-        String url = "jdbc:mysql://localhost:3306/marketresearchsw";
-        String username = "root";
-        String password = "Ash11032004";
-        
         try 
         {
-
-            Connection conn = DriverManager.getConnection(url, username, password);
+            Connection conn = DBConnect.getConnection();
 
             Random rand = new Random();
-            String newID = this.pID + username + rand.nextInt(1000);
+            String newID = this.pID + u.username + rand.nextInt(1000);
 
             String sql = "INSERT INTO review VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement statement = conn.prepareStatement(sql);
