@@ -80,9 +80,10 @@ class User
         errorMsg();
         return x;
     }
-    void reviewProduct(String company, String product, String productReview, int rating)
+    boolean reviewProduct(String company, String product, String productReview, int rating)
     {
         errorMsg();
+        return false;
     }
 
     void errorMsg()

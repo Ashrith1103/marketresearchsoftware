@@ -48,6 +48,8 @@ public class ApiServer {
         server.createContext("/company-exec/reports", new ActionHandler("company-exec-reports"));
         server.createContext("/company-exec/reviews", new ActionHandler("company-exec-reviews"));
         server.createContext("/customer/surveys/fill", new ActionHandler("customer-fill-survey"));
+        server.createContext("/customer/reviews/fill", new ActionHandler("customer-fill-review"));
+        server.createContext("/customer/reviews", new ActionHandler("customer-reviews"));
         server.createContext("/customer/surveys", new ActionHandler("customer-surveys"));
         server.createContext("/customer/catalogue", new ActionHandler("customer-catalogue"));
         server.setExecutor(null); // default executor
@@ -297,6 +299,38 @@ public class ApiServer {
                         sendJson(exchange, 200, "{\"success\":true,\"message\":\"Survey submitted successfully.\"}");
                         return;
 
+                    case "customer-fill-review":
+                        if (user.role != Role.Customer) {
+                            sendJson(exchange, 403, "{\"success\":false,\"message\":\"This endpoint is only for Customers.\"}");
+                            return;
+                        }
+                        String company = queryParams.get("company");
+                        String product = queryParams.get("product");
+                        String reviewText = queryParams.get("review");
+                        String ratingText = queryParams.get("rating");
+                        if (isBlank(company) || isBlank(product) || isBlank(reviewText) || isBlank(ratingText)) {
+                            sendJson(exchange, 200, "{\"success\":false,\"message\":\"Fill review requires company, product, review, rating params.\"}");
+                            return;
+                        }
+                        int rating;
+                        try {
+                            rating = Integer.parseInt(ratingText);
+                        } catch (NumberFormatException e) {
+                            sendJson(exchange, 200, "{\"success\":false,\"message\":\"Rating must be a number between 1 and 5.\"}");
+                            return;
+                        }
+                        if (rating < 1 || rating > 5) {
+                            sendJson(exchange, 200, "{\"success\":false,\"message\":\"Rating must be between 1 and 5.\"}");
+                            return;
+                        }
+                        boolean submitted = user.reviewProduct(company, product, reviewText, rating);
+                        if (!submitted) {
+                            sendJson(exchange, 200, "{\"success\":false,\"message\":\"You cannot review the same device twice (or product is invalid).\"}");
+                            return;
+                        }
+                        sendJson(exchange, 200, "{\"success\":true,\"message\":\"Review submitted successfully.\"}");
+                        return;
+
                     case "customer-surveys":
                         if (user.role != Role.Customer) {
                             sendJson(exchange, 403, "{\"success\":false,\"message\":\"This endpoint is only for Customers.\"}");
@@ -315,6 +349,16 @@ public class ApiServer {
                         String customerCatalogue = getAllCatalogueJson();
                         sendJson(exchange, 200,
                                 "{\"success\":true,\"message\":\"Catalogue retrieved.\",\"catalogue\":" + customerCatalogue + "}");
+                        return;
+
+                    case "customer-reviews":
+                        if (user.role != Role.Customer) {
+                            sendJson(exchange, 403, "{\"success\":false,\"message\":\"This endpoint is only for Customers.\"}");
+                            return;
+                        }
+                        String customerReviews = Review.viewAvailableReviews();
+                        sendJson(exchange, 200,
+                                "{\"success\":true,\"message\":\"Available devices to review retrieved.\",\"reviews\":" + customerReviews + "}");
                         return;
 
                     default:

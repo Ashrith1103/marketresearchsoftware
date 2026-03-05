@@ -87,14 +87,18 @@ class Customer extends User
     }
 
     @Override
-    void reviewProduct(String company, String product, String productReview, int rating)
+    boolean reviewProduct(String company, String product, String productReview, int rating)
     {
         String pID = Product.getProductID(product, company);
+        if (pID == null || pID.isBlank()) {
+            System.out.println("Invalid product/company combination");
+            return false;
+        }
         //get review and rating from user
         Review review = new Review(pID, productReview, rating);
         //System.out.println(review.pID + "\t" + review.rating + "\t" + review.review + "\t" + review.dateOfReview);
         //put into db
-        review.addReview(this);
+        return review.addReview(this);
         //get confirmation msg
     }
 

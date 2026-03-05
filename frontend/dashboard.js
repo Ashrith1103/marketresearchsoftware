@@ -67,6 +67,22 @@ function getActionParams(role, actionKey) {
     return { surveyID, a1, a2, a3 };
   }
 
+  if (role === "Customer" && actionKey === "fill-review") {
+    const company = askRequired("Company name:");
+    if (!company) return null;
+    const product = askRequired("Product name:");
+    if (!product) return null;
+    const review = askRequired("Your review:");
+    if (!review) return null;
+    const ratingInput = askRequired("Rating (1-5):");
+    if (!ratingInput) return null;
+    const rating = Number.parseInt(ratingInput, 10);
+    if (Number.isNaN(rating) || rating < 1 || rating > 5) {
+      return { _invalid: "Rating must be a number between 1 and 5." };
+    }
+    return { company, product, review, rating: String(rating) };
+  }
+
   if (role === "MarketResearcher" && actionKey === "delete-survey") {
     const surveyID = askRequired("Survey ID to delete:");
     if (!surveyID) return null;
@@ -157,6 +173,8 @@ function getActionRoute(role, actionKey) {
     if (actionKey === "view-reviews") return "/company-exec/reviews";
   } else if (role === "Customer") {
     if (actionKey === "fill-survey") return "/customer/surveys/fill";
+    if (actionKey === "fill-review") return "/customer/reviews/fill";
+    if (actionKey === "view-available-reviews") return "/customer/reviews";
     if (actionKey === "view-available-surveys") return "/customer/surveys";
     if (actionKey === "view-catalogue") return "/customer/catalogue";
   }
@@ -184,6 +202,9 @@ async function callBackendAction(role, actionKey) {
   const extraParams = getActionParams(role, actionKey);
   if (extraParams === null) {
     return { success: false, message: "Action cancelled." };
+  }
+  if (extraParams?._invalid) {
+    return { success: false, message: extraParams._invalid };
   }
 
   Object.entries(extraParams).forEach(([key, value]) => {
@@ -235,6 +256,8 @@ function getRoleConfig(role, company, accessLevel) {
     description: "You are logged in as a Customer. You can participate in surveys and view your history.",
     actions: [
       { label: "Fill a survey", key: "fill-survey" },
+      { label: "Fill a review", key: "fill-review" },
+      { label: "View available devices to review", key: "view-available-reviews" },
       { label: "View available surveys", key: "view-available-surveys" },
       { label: "View catalogue", key: "view-catalogue" },
     ],
