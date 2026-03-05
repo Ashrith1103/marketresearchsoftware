@@ -9,10 +9,10 @@ final class DBConnect {
             System.getProperty("mr.db.url", "jdbc:mysql://localhost:3306/marketresearchsw");
     private static final String USER =
             System.getProperty("mr.db.user", "root");
-    private static final String PASSWORD =
-            System.getProperty("mr.db.password", "");
-    private static final String FALLBACK_PASSWORD =
-            System.getProperty("mr.db.password.fallback", "Ash11032004");
+        private static final String PRIMARY_SECRET =
+            System.getProperty("mr.db.secret", "");
+        private static final String FALLBACK_SECRET =
+            System.getProperty("mr.db.secret.fallback", "");
 
     private DBConnect() {
     }
@@ -25,12 +25,12 @@ final class DBConnect {
         }
 
         try {
-            return DriverManager.getConnection(URL, USER, PASSWORD);
+            return DriverManager.getConnection(URL, USER, PRIMARY_SECRET);
         } catch (SQLException primaryEx) {
-            if (FALLBACK_PASSWORD.equals(PASSWORD)) {
+            if (FALLBACK_SECRET.equals(PRIMARY_SECRET)) {
                 throw primaryEx;
             }
-            return DriverManager.getConnection(URL, USER, FALLBACK_PASSWORD);
+            return DriverManager.getConnection(URL, USER, FALLBACK_SECRET);
         }
     }
 }
